@@ -23,19 +23,29 @@ class _FormWidget extends State<FormWidget> {
     User currentUser = FirebaseAuth.instance.currentUser!;
 
     return Container(
-        padding: EdgeInsets.all(15),
+        padding: EdgeInsets.symmetric(vertical: 30, horizontal: 15),
         child: Form(
           key: _formKey,
           child: Column(
             children: [
               TextFormField(
                 decoration: const InputDecoration(
-                  icon: Icon(Icons.task_outlined, color: Colors.greenAccent,),
                   hintText: "¿Cual es el titulo de la tarea?",
                   labelText: "Titulo de la tarea",
-                  hoverColor: Colors.grey,
+                  hoverColor: Colors.cyan,
+                  labelStyle: TextStyle(color: Colors.grey),
                   hintStyle: TextStyle(color: Colors.grey),
-                  disabledBorder: OutlineInputBorder(borderSide: BorderSide(width: 1, color: Colors.transparent)),
+                  fillColor: Colors.cyan,
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(
+                      color: Colors.cyan
+                    )
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(
+                      color: Colors.grey
+                    )
+                  )
                 ),
                 onChanged: (value) {
                   title = value;
@@ -76,11 +86,35 @@ class _FormWidget extends State<FormWidget> {
                     }).then((value) => {
                       Navigator.of(context).pop()
                     }).catchError((e) => {
-
+                      print(e)
                     });
                   },
                   label: Text("Crear tarea", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
                   icon: Icon(Icons.add, size: 30,),
+                ),
+              ),
+              SizedBox(height: 10,),
+              Container(
+                alignment: Alignment.center,
+                child: ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(
+                    primary: Colors.red,
+                    minimumSize: const Size.fromHeight(50),
+                  ),
+                  onPressed: () async {
+                    await FirebaseFirestore.instance.collection("tasks").add({
+                      'title': title,
+                      'category': selectedCategory,
+                      'date': DateTime.now().toString(),
+                      'uid': currentUser.uid,
+                    }).then((value) => {
+                      Navigator.of(context).pop()
+                    }).catchError((e) => {
+                      Navigator.of(context).pop()
+                    });
+                  },
+                  label: Text("Cancelar", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
+                  icon: Icon(Icons.close, size: 30,),
                 ),
               )
             ],
